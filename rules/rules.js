@@ -26,7 +26,7 @@ function createRules(wordleSolution, moonPhase) {
     return [
     new Rule(
         "Your password must include a roman numeral.",
-        (t) => /[IVXLCDM]/i.test(t)
+        (t) => /[IVXLCDM]/.test(t)
     ),
     new Rule(
         "Your password must include an uppercase and a lowercase letter.",

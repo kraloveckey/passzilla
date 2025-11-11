@@ -95,6 +95,7 @@ export default function Home() {
     }
      
     function checkRules(txt) {
+        if(loading) return;
         if(ruleState.length===0) return;
 
         if (justSolvedJumpRule.current) {
