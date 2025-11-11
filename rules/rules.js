@@ -22,7 +22,7 @@ import RuleCurrentTime from "./RuleCurrentTime/RuleCurrentTime";
 import RuleRetype from "./RuleRetype/RuleRetype";
 import RuleRetypeNoPaste from "./RuleRetypeNoPaste/RuleRetypeNoPaste";
 
-function createRules(wordleSolution) {
+function createRules(wordleSolution, moonPhase) {
     return [
     new Rule(
         "Your password must include a roman numeral.",
@@ -93,7 +93,7 @@ function createRules(wordleSolution) {
     new RuleWordle(wordleSolution),
     new RuleEarthquake(),
     new RuleQR(),
-    new RuleMoonPhase(),
+    new RuleMoonPhase(moonPhase),
     new RuleMorse(),
     new RulePetEgg(),
     new RuleLocation(),
