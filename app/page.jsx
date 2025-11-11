@@ -80,6 +80,12 @@ export default function Home() {
             loadGameData();
     }, []);
 
+    useEffect(() => {
+        if (loading === false) {
+            checkRules(pswd);
+        }
+    }, [loading, pswd]);
+
     function setPswdAndCheckRules(txt) {
     if (txt.length < pswd.length) {
             const retypeRule = ruleState.find(r => r instanceof RuleRetypeNoPaste);
@@ -94,50 +100,57 @@ export default function Home() {
         checkRules(txt);
     }
      
-    function checkRules(txt) {
-        if(loading) return;
-        if(ruleState.length===0) return;
+function checkRules(txt) {
+        if (ruleState.length === 0) return;
 
         if (justSolvedJumpRule.current) {
             if (aaParent.current) aaEnableAnimations(aaParent.current, true);
             justSolvedJumpRule.current = false;
         }
-        
+
         let rules = [...ruleState];
         let solved_count = 0;
-        
-        for(let i=0;i<rules.length;i++) {
-            if(i===max_unlocked_rules.current) {
-                if(solved_count===max_unlocked_rules.current) {
-                    rules[i].unlocked = true;
-                    max_unlocked_rules.current++;
-                } 
-                else{ 
-                    break; 
+        let allPreviousRulesSolved = true; 
+
+        for (let i = 0; i < rules.length; i++) {
+            if (rules[i].unlocked === false && i === max_unlocked_rules.current && allPreviousRulesSolved) {
+                rules[i].unlocked = true;
+                max_unlocked_rules.current++;
+            }
+
+            if (rules[i].unlocked) {
+                const freezeAnimations = () => {
+                    if (aaParent.current) aaEnableAnimations(aaParent.current, false);
+                    justSolvedJumpRule.current = true;
+                };
+
+                const propsToChild = { 
+                    pswd: txt, 
+                    setPswd: setPswdAndCheckRules, 
+                    shakePasswordBox, 
+                    regenerateRule, 
+                    correct: rules[i].correct, 
+                    freezeAnimations, 
+                    num: rules[i].num
+                };
+                
+                rules[i].correct = rules[i].check(txt, propsToChild);
+
+                if (rules[i].correct) {
+                    solved_count++;
+                } else {
+                    allPreviousRulesSolved = false;
                 }
             }
-            
-            const freezeAnimations = () => {
-                if (aaParent.current) aaEnableAnimations(aaParent.current, false);
-                justSolvedJumpRule.current = true;
-            };
-            
-            const propsToChild = {pswd: txt, setPswd: setPswdAndCheckRules, shakePasswordBox, regenerateRule, correct: rules[i].correct, freezeAnimations};
-            rules[i].correct = rules[i].check(txt, propsToChild);
-
-            if(rules[i].correct) {
-                solved_count++;
-            }
         }
-        
+
         setRuleState(rules);
-        
-        if(solved_count===rules.length) {
+
+        if (solved_count === rules.length && rules.length > 0) {
             if (aaParent.current) aaEnableAnimations(aaParent.current, false);
             setAllSolved(true);
-        setShowConfetti(true);
-        }
-        else{
+            setShowConfetti(true);
+        } else {
             setAllSolved(false);
         }
     }
