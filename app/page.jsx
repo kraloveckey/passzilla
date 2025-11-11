@@ -10,6 +10,8 @@ import RuleBox from "../components/RuleBox";
 import CongratsBox from "../components/CongratsBox";
 import { createRules, sort_rules } from "../rules/rules";
 import RuleRetypeNoPaste from "../rules/RuleRetypeNoPaste/RuleRetypeNoPaste";
+import RuleWordle from "../rules/RuleWordle/RuleWordle";
+import RuleMoonPhase from "../rules/RuleMoonPhase/RuleMoonPhase";
 
 async function get_todays_wordle() {
     const url = `/api/wordle`;
@@ -50,7 +52,6 @@ async function get_moon_phase() {
 export default function Home() {
     const [pswd, setPswd] = useState("");
     const [ruleState, setRuleState] = useState([]); 
-    const [loading, setLoading] = useState(true);
     const max_unlocked_rules = useRef(0);
     const pswdBoxRef = useRef(null);
     const [aaParent, aaEnableAnimations] = useAutoAnimate();
@@ -58,33 +59,64 @@ export default function Home() {
     const [showConfetti, setShowConfetti] = useState(false);
     const justSolvedJumpRule = useRef(false);
 
-    useEffect(() => {
-        async function loadGameData() {
-            const [wordleSolution, moonPhaseEmoji] = await Promise.all([
-                get_todays_wordle(),
-                get_moon_phase()
-            ]);
-            const ruleList = createRules(wordleSolution, moonPhaseEmoji);
-            const initialRules = ruleList.map((rule, i) => {
-                const newRule = Object.create(Object.getPrototypeOf(rule));
-                Object.assign(newRule, rule);
-                newRule.num = i + 1;
-                newRule.correct = false;
-                newRule.unlocked = false;
-                return newRule;
-            });
-            max_unlocked_rules.current = 0;
-            setRuleState(initialRules);
-            setLoading(false);
-    }
-            loadGameData();
-    }, []);
+useEffect(() => {
+        const ruleList = createRules(null, null);         
+        const initialRules = ruleList.map((rule, i) => {
+            const newRule = Object.create(Object.getPrototypeOf(rule));
+            Object.assign(newRule, rule);
+            newRule.num = i + 1;
+            newRule.correct = false;
+            newRule.unlocked = false;
+            return newRule;
+        });
+        max_unlocked_rules.current = 0;
+        setRuleState(initialRules);
 
-    useEffect(() => {
-        if (loading === false && pswd.length > 0) {
-            checkRules(pswd);
-        }
-    }, [loading]);
+        get_todays_wordle().then(wordleSolution => {
+            if (wordleSolution && wordleSolution !== "ERROR") {
+                setRuleState(currentRules => {
+                    const wordleRuleIndex = currentRules.findIndex(r => r instanceof RuleWordle);
+                    
+                    if (wordleRuleIndex > -1) {
+                        const newRules = [...currentRules];
+                        const oldRule = newRules[wordleRuleIndex];
+                        
+                        const updatedRule = Object.create(Object.getPrototypeOf(oldRule));
+                        Object.assign(updatedRule, oldRule);
+                        
+                        updatedRule.solution = wordleSolution; 
+                        
+                        newRules[wordleRuleIndex] = updatedRule;
+                        return newRules;
+                    }
+                    return currentRules;
+                });
+            }
+        });
+
+        get_moon_phase().then(moonPhaseEmoji => {
+            if (moonPhaseEmoji) {
+                setRuleState(currentRules => {
+                    const moonRuleIndex = currentRules.findIndex(r => r instanceof RuleMoonPhase);
+                    
+                    if (moonRuleIndex > -1) {
+                        const newRules = [...currentRules];
+                        const oldRule = newRules[moonRuleIndex];
+
+                        const updatedRule = Object.create(Object.getPrototypeOf(oldRule));
+                        Object.assign(updatedRule, oldRule);
+
+                        updatedRule.moonEmoji = moonPhaseEmoji.trim();
+                        
+                        newRules[moonRuleIndex] = updatedRule;
+                        return newRules;
+                    }
+                    return currentRules;
+                });
+            }
+        });
+
+    }, []);
 
     function setPswdAndCheckRules(txt) {
     if (txt.length < pswd.length) {
