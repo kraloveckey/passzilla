@@ -81,10 +81,10 @@ export default function Home() {
     }, []);
 
     useEffect(() => {
-        if (loading === false) {
+        if (loading === false && pswd.length > 0) {
             checkRules(pswd);
         }
-    }, [loading, pswd]);
+    }, [loading]);
 
     function setPswdAndCheckRules(txt) {
     if (txt.length < pswd.length) {
