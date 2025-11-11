@@ -60,7 +60,7 @@ export default function Home() {
     const justSolvedJumpRule = useRef(false);
 
 useEffect(() => {
-        const ruleList = createRules(null, null);         
+        const ruleList = createRules(null, null);
         const initialRules = ruleList.map((rule, i) => {
             const newRule = Object.create(Object.getPrototypeOf(rule));
             Object.assign(newRule, rule);
@@ -76,16 +76,16 @@ useEffect(() => {
             if (wordleSolution && wordleSolution !== "ERROR") {
                 setRuleState(currentRules => {
                     const wordleRuleIndex = currentRules.findIndex(r => r instanceof RuleWordle);
-                    
+
                     if (wordleRuleIndex > -1) {
                         const newRules = [...currentRules];
                         const oldRule = newRules[wordleRuleIndex];
-                        
+
                         const updatedRule = Object.create(Object.getPrototypeOf(oldRule));
                         Object.assign(updatedRule, oldRule);
-                        
+
                         updatedRule.solution = wordleSolution; 
-                        
+
                         newRules[wordleRuleIndex] = updatedRule;
                         return newRules;
                     }
@@ -219,7 +219,7 @@ function checkRules(txt) {
         window.location.reload();
     }
 
-    return (
+return (
         <div className={styles.pageWrapper}>
         {showConfetti && (
             <Confetti
@@ -263,23 +263,23 @@ function checkRules(txt) {
 
             <PasswordBox pswd={pswd} setPswd={setPswdAndCheckRules} ref={pswdBoxRef}/>
 
-       {allSolved && <CongratsBox
-            heading={"Congratulations \u{1F3C6}\u{1F608}"} 
-            msg={"You have successfully created a password \u{1F977}\u{2694}"}
-        />} 
-
-       {allSolved && (
-        <button className={styles.playAgainButton} onClick={handleHeaderClick}>
-            <span className={styles.playAgainIcon}></span>
-               Play Again?
-           </button>
-       )}
-            
-            {max_unlocked_rules.current > 0 && (
-           <div className={styles.levelCounter}>Level: {max_unlocked_rules.current}</div>
-       )}
-
             <div ref={aaParent}>
+                {allSolved && <CongratsBox
+                    heading={"Congratulations \u{1F3C6}\u{1F608}"}
+                    msg={"You have successfully created a password \u{1F977}\u{2694}"}
+                />}
+
+                {allSolved && (
+                <button className={styles.playAgainButton} onClick={handleHeaderClick}>
+                    <span className={styles.playAgainIcon}></span>
+                    Play Again?
+                </button>
+                )}
+
+                {max_unlocked_rules.current > 0 && (
+                    <div className={styles.levelCounter}>Level: {max_unlocked_rules.current}</div>
+                )}
+
                 {ruleState.filter(r => r.unlocked).sort(sort_rules).map(r => {
                     return(
                         <RuleBox

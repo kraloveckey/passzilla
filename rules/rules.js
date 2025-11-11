@@ -25,12 +25,12 @@ import RuleRetypeNoPaste from "./RuleRetypeNoPaste/RuleRetypeNoPaste";
 function createRules(wordleSolution, moonPhase) {
     return [
     new Rule(
-        "Your password must include a roman numeral.",
-        (t) => /[IVXLCDM]/.test(t)
-    ),
-    new Rule(
         "Your password must include an uppercase and a lowercase letter.",
         (t) => (/[A-Z]/.test(t) && /[a-z]/.test(t))
+    ),
+    new Rule(
+        "Your password must include a roman numeral.",
+        (t) => /[IVXLCDM]/.test(t)
     ),
     new Rule(
         "Your password must include a two-letter symbol from the periodic table.",
